@@ -7,7 +7,6 @@
  */
 
 namespace app\api\service;
-use PHPMailer\SendEmail as SendEmailq;
 
 class SendEmail extends EmailService
 {
