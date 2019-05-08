@@ -10,21 +10,20 @@ namespace app\api\service;
 use think\Request;
 use think\Cache;
 
-class Token
+class Token extends BaseService
 {
     //生成token
     public static function generateToken($char_len = 32){
         //32位随机字符串
-        $randChars = getRandChar(32);
+        $randChars = getRandChar($char_len);
         $timestamp = $_SERVER['REQUEST_TIME_FLOAT'];
         //salt 盐
-        $salt = config('secure.token_salt');
+        $salt = config('wechat.token_salt');
         return md5($randChars.$timestamp.$salt);
     }
 
     public static function getCurrentUid(){
-        $uid = self::getCurrentTokenVar('id');
-        return $uid;
+        return self::getCurrentTokenVar('id');
     }
 
     public static function getSessionKey(){
@@ -32,16 +31,15 @@ class Token
     }
 
     public static function getOpenId(){
-        return self::getCurrentTokenVar('openid');
+        return self::getCurrentTokenVar('open_id');
     }
 
     public static function getCurrentTokenVar($key=null){
         $token = self::getTokens();
         $vars = Cache::get($token);
         if(!$vars){
-            throw new TokenException();
-        }
-        else{
+            return json_encode(['msg'=>'token无效']);
+        } else{
             if(!is_array($vars)){
                 $vars = json_decode($vars,true);
             }
@@ -50,9 +48,8 @@ class Token
             }
             if(array_key_exists($key,$vars)){
                 return $vars[$key];
-            }
-            else{
-                throw new Exception("尝试获取的cache值$key 不存在");
+            } else{
+                return json_encode(['msg'=>'尝试获取的cache值'.$key.'不存在']);
             }
         }
     }

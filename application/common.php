@@ -20,3 +20,17 @@ function getRandChar($n){
     }
     return $str;
 }
+//发送请求的function
+function curl_get($url,&$httpCode = 0){
+    $ch =curl_init();
+    curl_setopt($ch,CURLOPT_URL,$url);
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+
+    //不做证书校验，再linux下要换true
+    curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+    curl_setopt($ch,CURLOPT_TIMEOUT,10);
+    $file_contents = curl_exec($ch);
+    $httpCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return $file_contents;
+}
