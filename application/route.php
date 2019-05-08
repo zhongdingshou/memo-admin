@@ -12,6 +12,7 @@ Route::post('api/:version/secret/getDetail','api/:version.Secret/getDetail');//�
 Route::post('api/:version/secret/creatSecret','api/:version.Secret/creatSecret');//创建备忘录
 Route::post('api/:version/secret/editSecret','api/:version.Secret/editSecret');//编辑备忘录
 Route::post('api/:version/secret/delSecret','api/:version.Secret/delSecret');//删除备忘录
+Route::post('api/:version/secret/searchSecret','api/:version.Secret/searchSecret');//搜索备忘录
 
 Route::post('api/:version/command/checkCommand','api/:version.Command/checkCommand');//口令验证
 Route::post('api/:version/command/newCommand','api/:version.Command/newCommand');//口令设置

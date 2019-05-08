@@ -86,6 +86,13 @@ class Secret extends BaseController
     }
 
 
+    /**
+     * 编辑备忘录
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function editSecret(){
         $this->isLogin();
         $user_id = Token::getCurrentUid();
@@ -115,6 +122,13 @@ class Secret extends BaseController
         }
     }
 
+    /**
+     * 删除备忘录
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function delSecret(){
         $this->isLogin();
         $user_id = Token::getCurrentUid();
@@ -127,5 +141,17 @@ class Secret extends BaseController
         } else {
             return json_encode(['msg'=>'该账号密码备忘录不存在']);
         }
+    }
+
+    public function searchSecret(){
+        $this->isLogin();
+        $user_id = Token::getCurrentUid();
+        Loader::validate('SearchSecretValidate')->goCheck();
+        $keywords = Loader::validate('SearchSecretValidate')->getDataByRule(input('post.'))['keywords'];
+        $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(15)->column('id,describe');
+        if ($searchSecret)
+            return json_encode($searchSecret);
+        return json_encode(['msg'=>'未搜到相关备忘录，请检查']);
+
     }
 }
