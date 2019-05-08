@@ -12,6 +12,7 @@ use think\Request;
 class GetUserIp extends BaseService
 {
     /**
+     * 获取请求IP
      * @return mixed
      */
     public static function getIP(){

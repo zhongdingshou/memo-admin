@@ -11,6 +11,12 @@ namespace app\api\service;
 
 class EmailService extends BaseService
 {
+    /**
+     * 初始化邮箱服务
+     * @param $toemail
+     * @return \PHPMailer\PHPMailer
+     * @throws \PHPMailer\Exception
+     */
     public static function initStmp($toemail) {
         $mail = new \PHPMailer\PHPMailer();
         $from = config('smtp.nums');

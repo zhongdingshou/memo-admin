@@ -49,9 +49,16 @@ class User extends BaseController
         return false;
     }
 
+    /**
+     * 用户弃用小程序
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function quitApplet(){
         $this->isLogin();
-        if (Token::getCurrentTokenVar('is_set')==0){
+        if (!Token::getCurrentTokenVar('is_set')){
             Secret::where('user_id','=',Token::getCurrentUid())->delete();
             UserModel::where('id','=',Token::getCurrentUid())->delete();
             EncryptedModel::where('user_id','=',Token::getCurrentUid())->delete();

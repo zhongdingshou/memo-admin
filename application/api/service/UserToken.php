@@ -15,6 +15,10 @@ class UserToken extends Token
     protected $wxAppSecret;
     protected $wxLoginUrl;
 
+    /**
+     * UserToken constructor.
+     * @param $code
+     */
     public function __construct($code){
         $this->code = $code;
         $this->wxAppID = config('wechat.app_id');
@@ -22,6 +26,9 @@ class UserToken extends Token
         $this->wxLoginUrl = sprintf(config('wechat.login_url'),$this->wxAppID,$this->wxAppSecret,$this->code);
     }
 
+    /**
+     * @return array|false|string
+     */
     public function get(){
         $result = curl_get($this->wxLoginUrl);// common.php 全局function
         $wxResult = json_decode($result,true);
@@ -41,7 +48,11 @@ class UserToken extends Token
         }
     }
 
-    //更新token对应的内容
+    /**
+     * 更新token对应的内容
+     * @param $news
+     * @return false|string
+     */
     public static function update($news){
         $token = Token::getTokens();
         $token_datas = $news;
@@ -55,7 +66,16 @@ class UserToken extends Token
         return json_encode(['msg'=>'缓存设置成功']);
     }
 
-    //颁发自定义令牌
+
+    /**
+     * 颁发自定义令牌
+     * @param $wxResult
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     private function grantToken($wxResult){
         // 拿到openid
         $data['open_id'] = $wxResult['openid'];
@@ -76,14 +96,22 @@ class UserToken extends Token
     }
 
 
-    //准备数据
+    /**
+     * 准备数据
+     * @param $user
+     * @return mixed
+     */
     private function prepareCachedValue($user){
         $cacheValue = $user;
         $cacheValue['ip'] = GetUserIp::getIP();
         return $cacheValue;
     }
 
-    //写入缓存
+    /**
+     * 写入缓存
+     * @param $cacheValue
+     * @return false|string
+     */
     private function saveToCache($cacheValue){
         $key = self::generateToken();
         $value = json_encode($cacheValue);
@@ -95,7 +123,11 @@ class UserToken extends Token
         return $key;
     }
 
-    //快速生成邮箱对应的token
+    /**
+     * 快速生成邮箱对应的token
+     * @param $email
+     * @return bool|false|string
+     */
     public static function saveEmailToCache($email){
         $key = self::getTokens().mt_rand(100000,999999);
         $expire_in = config('wechat.email_validate_time');

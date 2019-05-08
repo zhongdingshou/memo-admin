@@ -12,6 +12,12 @@ namespace app\api\service;
 class EncryptRoute extends EncryptRules
 {
 
+    /**
+     * 加密路由
+     * @param $name
+     * @param $data
+     * @return string
+     */
     public static function Route($name,$data){
         switch ($name){
             case '1':$data=self::addone($data);break;

@@ -11,6 +11,12 @@ namespace app\api\service;
 
 class DecodeRoute extends DecodeRules
 {
+    /**
+     * 解密路由
+     * @param $name
+     * @param $data
+     * @return bool|string
+     */
     public static function Route($name,$data){
         switch ($name){
             case '1':$data=self::addone($data);break;

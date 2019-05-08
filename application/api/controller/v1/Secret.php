@@ -143,6 +143,10 @@ class Secret extends BaseController
         }
     }
 
+    /**
+     * 搜索备忘录
+     * @return false|string
+     */
     public function searchSecret(){
         $this->isLogin();
         $user_id = Token::getCurrentUid();
