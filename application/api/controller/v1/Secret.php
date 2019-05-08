@@ -148,10 +148,12 @@ class Secret extends BaseController
         $user_id = Token::getCurrentUid();
         Loader::validate('SearchSecretValidate')->goCheck();
         $keywords = Loader::validate('SearchSecretValidate')->getDataByRule(input('post.'))['keywords'];
-        $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(15)->column('id,describe');
-        if ($searchSecret)
-            return json_encode($searchSecret);
-        return json_encode(['msg'=>'未搜到相关备忘录，请检查']);
-
+        if (trim($keywords)){
+            $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(15)->column('id,describe');
+            if ($searchSecret)
+                return json_encode($searchSecret);
+            return json_encode(['msg'=>'未搜到相关备忘录，请检查']);
+        }
+        return json_encode(['msg'=>'请输入搜索关键词']);
     }
 }
