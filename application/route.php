@@ -19,6 +19,7 @@ Route::post('api/:version/command/newCommand','api/:version.Command/newCommand')
 
 Route::get('api/:version/encrypted/getEncrypted','api/:version.Encrypted/getEncrypted');//获取密保列表
 Route::post('api/:version/encrypted/checkEncrypted','api/:version.Encrypted/checkEncrypted');//密保验证
+Route::post('api/:version/encrypted/newEncrypted','api/:version.Encrypted/newEncrypted');//密保设置
 
 Route::get('api/:version/encryption/getEncryption','api/:version.Encryption/getEncryption');//获取加密列表
 Route::post('api/:version/encryption/newPackage','api/:version.Encryption/newPackage');//设置加密套餐
