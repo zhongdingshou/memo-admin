@@ -16,6 +16,15 @@ use app\api\service\ShellingOrDecan;
 class Command extends BaseController
 {
     /**
+     * 查看口令
+     * @return false|string
+     */
+    public function getCommand(){
+        $this->isLogin();
+        return json_encode(['msg'=>$command = UserToken::getTokens()&&Token::getCurrentTokenVar('is_set')!==null?Token::getCurrentTokenVar('command'):'']);
+    }
+
+    /**
      * 口令验证
      * @return false|string
      */

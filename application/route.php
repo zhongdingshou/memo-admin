@@ -16,6 +16,7 @@ Route::post('api/:version/secret/searchSecret','api/:version.Secret/searchSecret
 
 Route::post('api/:version/command/checkCommand','api/:version.Command/checkCommand');//口令验证
 Route::post('api/:version/command/newCommand','api/:version.Command/newCommand');//口令设置
+Route::get('api/:version/command/getCommand','api/:version.Command/getCommand');//查看口令
 
 Route::get('api/:version/encrypted/getEncrypted','api/:version.Encrypted/getEncrypted');//获取密保列表
 Route::post('api/:version/encrypted/checkEncrypted','api/:version.Encrypted/checkEncrypted');//密保验证

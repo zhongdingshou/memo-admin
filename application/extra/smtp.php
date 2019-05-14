@@ -6,10 +6,10 @@
  * Time: 23:33
  */
 return [
-    'nums' => "654643042@qq.com",
-    'password' => 'vpaqzzqvuknubede',//授权码
+    'nums' => "used.for.develop@qq.com",
+    'password' => 'zwptrlxynmwqbhea',//授权码
     'port' => 465,
     'host' => 'smtp.qq.com',
-    'name' => "个人账号密码备忘录系统管理员"
+    'name' => "备忘录小程序系统管理员"
 ];
 ?>
