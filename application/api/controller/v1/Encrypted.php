@@ -38,10 +38,10 @@ class Encrypted extends BaseController
         $encrypted = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->select();
         for ($i=0;$i<3;$i++){
             if ($answer[$i]!=$encrypted[$i]['answer']){
-                return json_encode(['msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
+                return json_encode(['status'=>0,'msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
             }
         }
-        return json_encode(['msg'=>'密保验证成功']);
+        return json_encode(['status'=>1,'msg'=>'密保验证成功']);
     }
 
     /**
@@ -82,8 +82,8 @@ class Encrypted extends BaseController
                 $data['is_set'] = $theUser['is_set'].'.3.';
                 User::where('id','=',$user_id)->update($data);
             }
-            return json_encode(['msg'=>'密保设置成功']);
+            return json_encode(['status'=>1,'msg'=>'密保设置成功']);
         }
-        return json_encode(['msg'=>'密保设置失败，请检查']);
+        return json_encode(['status'=>0,'msg'=>'密保设置失败，请检查']);
     }
 }

@@ -23,10 +23,20 @@ class Secret extends BaseController
     /**
      * 获取备忘录列表
      * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getSecret(){
         $this->isLogin();
-        return json_encode(SecretModel::where('user_id','=',Token::getCurrentUid())->column('id,describe'));
+        $allData = SecretModel::where('user_id','=',Token::getCurrentUid())->select();
+        foreach ($allData as $a){
+            unset($a['account']);
+            unset($a['password']);
+        }
+        if ($allData)
+            return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$allData]);
+        return json_encode(['status'=>0,'msg'=>'获取失败，暂未有数据','data'=>$allData]);
     }
 
     /**
@@ -51,9 +61,9 @@ class Secret extends BaseController
                 $password = DecodeRoute::Route($name, $password);
             }
             $theSecret['password'] = ShellingOrDecan::Shelling($password);
-            return json_encode($theSecret);
+            return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$theSecret]);
         }
-        return json_encode(['msg'=>'查看该账号密码备忘录失败，未设置加密套餐，请设置']);
+        return json_encode(['status'=>0,'msg'=>'查看该账号密码备忘录失败，未设置加密套餐，请设置']);
     }
 
     /**
@@ -79,9 +89,9 @@ class Secret extends BaseController
                 'account'=>$secret['account'],
                 'password'=>$password
             ]);
-            return json_encode(['msg'=>'该账号密码备忘录创建成功']);
+            return json_encode(['status'=>1,'msg'=>'该账号密码备忘录创建成功']);
         } else {
-            return json_encode(['msg'=>'该账号密码备忘录创建失败，未设置加密套餐，请设置']);
+            return json_encode(['status'=>0,'msg'=>'该账号密码备忘录创建失败，未设置加密套餐，请设置']);
         }
     }
 
@@ -112,13 +122,13 @@ class Secret extends BaseController
                 $data['password'] = $password;
                 $is_do = SecretModel::where('id','=',$secret['id'])->update($data);
                 if ($is_do)
-                    return json_encode(['msg'=>'该账号密码备忘录更新成功']);
-                return json_encode(['msg'=>'该账号密码备忘录更新失败或者信息未改变，请检查']);
+                    return json_encode(['status'=>1,'msg'=>'该账号密码备忘录更新成功']);
+                return json_encode(['status'=>0,'msg'=>'该账号密码备忘录更新失败或者信息未改变，请检查']);
             } else {
-                return json_encode(['msg'=>'该账号密码备忘录更新失败，未设置加密套餐，请设置']);
+                return json_encode(['status'=>0,'msg'=>'该账号密码备忘录更新失败，未设置加密套餐，请设置']);
             }
         } else {
-            return json_encode(['msg'=>'该账号密码备忘录不存在']);
+            return json_encode(['status'=>'0','msg'=>'该账号密码备忘录不存在']);
         }
     }
 
@@ -136,10 +146,10 @@ class Secret extends BaseController
         $secret_id = Loader::validate('DelSecretValidate')->getDataByRule(input('post.'))['id'];
         if (SecretModel::where('id','=',$secret_id)->where('user_id','=',$user_id)->find()){
             $is_do = SecretModel::where('id','=',$secret_id)->delete();
-            if ($is_do)return json_encode(['msg'=>'该账号密码备忘录删除成功']);
-            return json_encode(['msg'=>'该账号密码备忘录删除失败，请检查']);
+            if ($is_do)return json_encode(['status'=>1,'msg'=>'该账号密码备忘录删除成功']);
+            return json_encode(['status'=>0,'msg'=>'该账号密码备忘录删除失败，请检查']);
         } else {
-            return json_encode(['msg'=>'该账号密码备忘录不存在']);
+            return json_encode(['status'=>0,'msg'=>'该账号密码备忘录不存在']);
         }
     }
 
@@ -155,9 +165,9 @@ class Secret extends BaseController
         if (trim($keywords)){
             $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(15)->column('id,describe');
             if ($searchSecret)
-                return json_encode($searchSecret);
-            return json_encode(['msg'=>'未搜到相关备忘录，请检查']);
+                return json_encode(['status'=>1,'msg'=>'搜索成功','data'=>$searchSecret]);
+            return json_encode(['status'=>0,'msg'=>'未搜到相关备忘录，请检查']);
         }
-        return json_encode(['msg'=>'请输入搜索关键词']);
+        return json_encode(['status'=>0,'msg'=>'请输入搜索关键词']);
     }
 }

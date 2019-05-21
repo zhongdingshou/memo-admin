@@ -30,7 +30,7 @@ class Email extends BaseController
         $email = Loader::validate('EmailValidate')->getDataByRule(input('post.'));
         $is_go =  SendEmail::sendUserEmailCheck($email['email']);
         if ($is_go  === true)
-            return json_encode(['msg'=>'验证码发送成功']);
+            return json_encode(['status'=>1,'msg'=>'验证码发送成功']);
         User::where('id','=',Token::getCurrentUid())->update(['email'=>null]);
         return $is_go;
     }
@@ -68,12 +68,12 @@ class Email extends BaseController
                 }
                 UserToken::update(User::where('id','=',$user_id)->find());
                 \cache(UserToken::getTokens().$verify,null);
-                return json_encode(['msg'=>'邮箱设置成功']);
+                return json_encode(['status'=>1,'msg'=>'邮箱设置成功']);
             } else {
-                return json_encode(['msg'=>'邮箱设置失败或者内容没变化，请检查']);
+                return json_encode(['status'=>0,'msg'=>'邮箱设置失败或者内容没变化，请检查']);
             }
         } else {
-            return json_encode(['msg'=>'邮箱设置失败,验证码已过期']);
+            return json_encode(['status'=>0,'msg'=>'邮箱设置失败,验证码已过期']);
         }
     }
 

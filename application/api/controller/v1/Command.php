@@ -21,7 +21,7 @@ class Command extends BaseController
      */
     public function getCommand(){
         $this->isLogin();
-        return json_encode(['msg'=>$command = UserToken::getTokens()&&Token::getCurrentTokenVar('is_set')!==null?Token::getCurrentTokenVar('command'):'']);
+        return json_encode(['status'=>1,'msg'=>$command = UserToken::getTokens()&&Token::getCurrentTokenVar('is_set')!==null?Token::getCurrentTokenVar('command'):'']);
     }
 
     /**
@@ -33,8 +33,8 @@ class Command extends BaseController
         Loader::validate('CommandValidate')->goCheck();
         $command = Loader::validate('CommandValidate')->getDataByRule(input('post.'))['command'];
         if (ShellingOrDecan::Decan($command)===Token::getCurrentTokenVar('command'))
-            return json_encode(['msg'=>'口令验证成功']);
-        return json_encode(['msg'=>'口令验证失败，请检查']);
+            return json_encode(['status'=>1,'msg'=>'口令验证成功']);
+        return json_encode(['status'=>0,'msg'=>'口令验证失败，请检查']);
     }
 
     /**
@@ -67,9 +67,9 @@ class Command extends BaseController
                 User::where('id','=',$user_id)->update($data);
             }
             UserToken::update(User::where('id','=',$user_id)->find());
-            return json_encode(['msg'=>'口令设置成功']);
+            return json_encode(['status'=>1,'msg'=>'口令设置成功']);
         } else {
-            return json_encode(['msg'=>'口令设置失败或者内容没变化，请检查']);
+            return json_encode(['status'=>0,'msg'=>'口令设置失败或者内容没变化，请检查']);
         }
     }
 

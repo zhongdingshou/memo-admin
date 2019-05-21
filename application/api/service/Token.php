@@ -59,7 +59,7 @@ class Token extends BaseService
         $token = self::getTokens();
         $vars = Cache::get($token);
         if(!$vars){
-            return json_encode(['msg'=>'token无效']);
+            return json_encode(['status'=>0,'msg'=>'token无效']);
         } else{
             if(!is_array($vars)){
                 $vars = json_decode($vars,true);
@@ -70,7 +70,7 @@ class Token extends BaseService
             if(array_key_exists($key,$vars)){
                 return $vars[$key];
             } else{
-                return json_encode(['msg'=>'尝试获取的cache值'.$key.'不存在']);
+                return json_encode(['status'=>0,'msg'=>'尝试获取的cache值'.$key.'不存在']);
             }
         }
     }

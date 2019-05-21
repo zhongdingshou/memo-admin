@@ -28,17 +28,22 @@ class UserToken extends Token
 
     /**
      * @return array|false|string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function get(){
         $result = curl_get($this->wxLoginUrl);// common.php 全局function
         $wxResult = json_decode($result,true);
         if(empty($wxResult)){
-            return json_encode(['msg'=>'login时请求wx没有返回结果']);
+            return json_encode(['status'=>0,'msg'=>'login时请求wx没有返回结果']);
         } else{
             if(array_key_exists("errcode",$wxResult)){
                 $errcode = $wxResult['errcode'];
                 $errmsg = $wxResult['errmsg'];
                 return json_encode([
+                    "status"=>0,
                     'msg' => $errmsg,
                     'errcode' => $errcode
                 ]);
@@ -61,9 +66,9 @@ class UserToken extends Token
         $expire_in = config('setting.token_expire_in');
         $request = cache($token,$value,$expire_in);//tp5 内置缓存
         if(!$request){
-            return json_encode(['msg'=>'服务器缓存异常']);
+            return json_encode(["status"=>0,'msg'=>'服务器缓存异常']);
         }
-        return json_encode(['msg'=>'缓存设置成功']);
+        return json_encode(["status"=>1,'msg'=>'缓存设置成功']);
     }
 
 
@@ -92,7 +97,7 @@ class UserToken extends Token
         $cacheValue = $this->prepareCachedValue($user);
         $token = $this->saveToCache($cacheValue);
         // 返回到客户端
-        return array("token"=>$token,"is_set"=>$user['is_set']);
+        return array("status"=>1,"token"=>$token,"is_set"=>$user['is_set']);
     }
 
 
@@ -118,7 +123,7 @@ class UserToken extends Token
         $expire_in = config('wechat.token_expire_in');
         $request = cache($key,$value,$expire_in);//tp5 内置缓存
         if(!$request){
-            return json_encode(['msg'=>'服务器缓存异常']);
+            return json_encode(["status"=>0,'msg'=>'服务器缓存异常']);
         }
         return $key;
     }
@@ -133,7 +138,7 @@ class UserToken extends Token
         $expire_in = config('wechat.email_validate_time');
         $request = cache($key,$email,$expire_in);//tp5 内置缓存
         if(!$request){
-            return json_encode(['msg'=>'服务器缓存异常']);
+            return json_encode(["status"=>0,'msg'=>'服务器缓存异常']);
         }
         return substr($key,-6);
     }

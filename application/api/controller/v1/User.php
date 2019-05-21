@@ -31,9 +31,9 @@ class User extends BaseController
         if(!$this->alreadyLogin()){
             $ut = new UserToken($code);
             $token = $ut->get();
-            return json_encode([ 'msg'=>$token]);
+            return json_encode($token);
         } else {
-            return json_encode([ 'msg'=>'登陆成功']);
+            return json_encode(["status"=>2, 'msg'=>'登陆成功']);
         }
     }
 
@@ -63,7 +63,7 @@ class User extends BaseController
             UserModel::where('id','=',Token::getCurrentUid())->delete();
             EncryptedModel::where('user_id','=',Token::getCurrentUid())->delete();
             \cache(Token::getTokens(),null);
-            return json_encode(['msg'=>'弃用成功，欢迎下次使用']);
+            return json_encode(['status'=>1,'msg'=>'弃用成功，欢迎下次使用']);
         }
         Loader::validate('QuitAppletValidate')->goCheck();
         $quit = Loader::validate('QuitAppletValidate')->getDataByRule(input('post.'));
@@ -71,17 +71,17 @@ class User extends BaseController
             $encrypted = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->select();
             for ($i=0;$i<3;$i++){
                 if ($quit['answer'][$i]!=$encrypted[$i]['answer']){
-                    return json_encode(['msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
+                    return json_encode(['status'=>0,'msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
                 }
             }
         }else {
-            return json_encode(['msg'=>'口令验证失败，请检查']);
+            return json_encode(['status'=>0,'msg'=>'口令验证失败，请检查']);
         }
         Secret::where('user_id','=',Token::getCurrentUid())->delete();
         UserModel::where('id','=',Token::getCurrentUid())->delete();
         EncryptedModel::where('user_id','=',Token::getCurrentUid())->delete();
         \cache(Token::getTokens(),null);
-        return json_encode(['msg'=>'弃用成功，欢迎下次使用']);
+        return json_encode(['status'=>1,'msg'=>'弃用成功，欢迎下次使用']);
 
     }
 }

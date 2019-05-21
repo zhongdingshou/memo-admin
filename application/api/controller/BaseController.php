@@ -33,17 +33,17 @@ class BaseController extends Controller
                 for ($b=0;$b<4;$b++){
                     if ($cache_ip[$b]!==$now_id[$b]) {//比较ip，如果缓存ip和请求ip不相等
                         \cache($token,null);
-                        return json_encode(['msg'=>'IP不同，请重新登陆']);
+                        return json_encode(['status'=>0,'msg'=>'IP不同，请重新登陆']);
                     }
                 }
             } else {//有不合法的
                 \cache($token,null);
-                return json_encode(['msg'=>'非法IP，请重新登陆']);
+                return json_encode(['status'=>0,'msg'=>'非法IP，请重新登陆']);
             }
         }
     }
 
     public function isLogin(){
-        if (!Token::getTokens()) return json_encode(['msg'=>'未登录，无法操作，请登陆']);
+        if (!Token::getTokens()) return json_encode(['status'=>0,'msg'=>'未登录，无法操作，请登陆']);
     }
 }

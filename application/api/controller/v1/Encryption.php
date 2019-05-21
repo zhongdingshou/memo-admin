@@ -22,7 +22,7 @@ class Encryption extends BaseController
      */
     public function getEncryption(){
         $this->isLogin();
-        return json_encode(EncryptionModel::column('id,name'));
+        return json_encode(['status'=>1,'data'=>EncryptionModel::column('id,name')]);
     }
 
     /**
@@ -55,9 +55,9 @@ class Encryption extends BaseController
                 User::where('id','=',$user_id)->update($data);
             }
             UserToken::update(User::where('id','=',$user_id)->find());
-            return json_encode(['msg'=>'加密套餐设置成功']);
+            return json_encode(['status'=>1,'msg'=>'加密套餐设置成功']);
         } else{
-            return json_encode(['msg'=>'加密套餐设置失败或者内容没变化，请检查']);
+            return json_encode(['status'=>0,'msg'=>'加密套餐设置失败或者内容没变化，请检查']);
         }
     }
 
