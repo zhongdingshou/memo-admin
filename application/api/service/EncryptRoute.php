@@ -24,7 +24,7 @@ class EncryptRoute extends EncryptRules
                 $data=self::addone($data);break;
             case '加密2':
                 $data=self::addtwo($data);break;
-            case '加密3':
+            case '加密3加密3加密3':
                 $data=self::addthree($data);break;
             case '加密4':
                 $data=self::addfour($data);break;
@@ -32,6 +32,7 @@ class EncryptRoute extends EncryptRules
                 $data=self::addfive($data);break;
             case '加密6':
                 $data=self::addsix($data);break;
+            default: break;
         }
         return $data;
     }

@@ -17,23 +17,23 @@ class EncryptRules extends BaseService
         return $data;
     }
     public static function addtwo($data){
-        $data.=2;
+        $data.=22;
         return $data;
     }
     public static function addthree($data){
-        $data.=3;
+        $data.=333;
         return $data;
     }
     public static function addfour($data){
-        $data.=4;
+        $data.=4444;
         return $data;
     }
     public static function addfive($data){
-        $data.=5;
+        $data.=55555;
         return $data;
     }
     public static function addsix($data){
-        $data.=6;
+        $data.=666666;
         return $data;
     }
 }

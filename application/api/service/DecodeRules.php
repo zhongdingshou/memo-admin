@@ -16,23 +16,23 @@ class DecodeRules extends BaseService
         return $data;
     }
     public static function addtwo($data){
-        $data=substr($data,0,strlen($data)-1);
+        $data=substr($data,0,strlen($data)-2);
         return $data;
     }
     public static function addthree($data){
-        $data=substr($data,0,strlen($data)-1);
+        $data=substr($data,0,strlen($data)-3);
         return $data;
     }
     public static function addfour($data){
-        $data=substr($data,0,strlen($data)-1);
+        $data=substr($data,0,strlen($data)-4);
         return $data;
     }
     public static function addfive($data){
-        $data=substr($data,0,strlen($data)-1);
+        $data=substr($data,0,strlen($data)-5);
         return $data;
     }
     public static function addsix($data){
-        $data=substr($data,0,strlen($data)-1);
+        $data=substr($data,0,strlen($data)-6);
         return $data;
     }
 }

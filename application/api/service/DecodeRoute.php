@@ -31,6 +31,7 @@ class DecodeRoute extends DecodeRules
                 $data=self::addfive($data);break;
             case '解密6':
                 $data=self::addsix($data);break;
+            default: break;
         }
         return $data;
     }

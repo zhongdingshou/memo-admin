@@ -60,12 +60,18 @@ class Secret extends BaseController
         if ($package) {
             $EncryptionPackages = explode(',', $package);//获取加密套餐
             $password = $theSecret['password'];
-            for ($k = 1; $k < count($EncryptionPackages) - 1; $k++) {
+            for ($k = count($EncryptionPackages) - 2; $k > 0; $k--) {
                 $name = Encryption::where('id', '=', $EncryptionPackages[$k])->value('decrypt_name');
-                $password = DecodeRoute::Route($name, $password);
+                $temp = DecodeRoute::Route($name, $password);
+                if ($password != $temp) $password = $temp;
+                else break;
             }
-            $theSecret['password'] = ShellingOrDecan::Shelling($password,substr(Token::getTokens(),-16));
-            return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$theSecret]);
+            if ($k==0) {
+                $theSecret['password'] = ShellingOrDecan::Shelling($password,substr(Token::getTokens(),-16));
+                return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$theSecret]);
+            } else {
+                return json_encode(['status'=>0,'msg'=>'查看该账号密码备忘录失败']);
+            }
         }
         return json_encode(['status'=>0,'msg'=>'查看该账号密码备忘录失败，未设置加密套餐，请设置']);
     }

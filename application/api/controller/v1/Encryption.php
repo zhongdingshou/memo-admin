@@ -46,49 +46,46 @@ class Encryption extends BaseController
         Loader::validate('PackageValidate')->goCheck();
         $user_id = Token::getCurrentUid();
         $package = Loader::validate('PackageValidate')->getDataByRule(input('post.'));
-        $is_do = User::where('id','=',$user_id)->update(['package'=>ShellingOrDecan::Decan($package['package'])]);
-        if ($is_do) {
-            $theUser = User::where('id','=',$user_id)->find();
-            if ($theUser['is_set']){
-                $is_set =  explode('.',$theUser['is_set']);
-                for ($i=1;$i<count($is_set)-1;$i++){
-                    if ($is_set[$i]==2){
-                        break;
+        $theUser = User::where('id','=',$user_id)->find();
+        if ($theUser['package']) {
+            $EncryptionPackages = explode(',', $theUser['package']);//获取旧加密套餐
+            $newpackage = explode(',', ShellingOrDecan::Decan($package['package']));//获取新加密套餐
+            $secret = Secret::where('user_id','=',$user_id)->select();
+            foreach ($secret as $s){
+                $password = $s['password'];
+                for ($k = count($EncryptionPackages) - 2; $k > 0 ; $k--) {
+                    $name = EncryptionModel::where('id', '=', $EncryptionPackages[$k])->value('decrypt_name');
+                    $temp = DecodeRoute::Route($name, $password);
+                    if ($password != $temp) $password = $temp;
+                    else break;
+                }
+                if ($k == 0) {
+                    for ($j = 1; $j < count($newpackage) - 1; $j++) {
+                        $name = EncryptionModel::where('id', '=', $newpackage[$j])->value('name');
+                        $temp = EncryptRoute::Route($name, $password);
+                        if ($password != $temp) $password = $temp;
+                        else break;
                     }
+                    if ($j == count($newpackage) - 1) {
+                        Secret::where('id','=',$s['id'])->update(['password'=>$password]);
+                    } else {
+                        return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请检查']);
+                    }
+                } else {
+                    return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请检查']);
                 }
-                if ($i==count($is_set)-1) {
-                    $data['is_set'] = $theUser['is_set'].'2.';
-                    User::where('id','=',$user_id)->update($data);
-                }
+            }
+        } else {
+            if ($theUser['is_set']) {
+                $data['is_set'] = $theUser['is_set'].'2.';
             } else {
                 $data['is_set'] = $theUser['is_set'].'.2.';
-                User::where('id','=',$user_id)->update($data);
             }
-
-            $EncryptionPackages = explode(',', Token::getCurrentTokenVar('package'));//获取旧加密套餐
-            $newpackage = explode(',', ShellingOrDecan::Decan($package['package']));//获取新加密套餐
-            if ($EncryptionPackages){
-                $secret = Secret::where('user_id','=',$user_id)->select();
-                if ($secret){
-                    foreach ($secret as $s){
-                        $password = $s['password'];
-                        for ($k = count($EncryptionPackages) - 1; $k > 0 ; $k--) {
-                            $name = EncryptionModel::where('id', '=', $EncryptionPackages[$k])->value('decrypt_name');
-                            $password = DecodeRoute::Route($name, $password);
-                        }
-                        for ($j = 1; $j < count($newpackage) - 1; $j++) {
-                            $name = EncryptionModel::where('id', '=', $newpackage[$j])->value('name');
-                            $password = EncryptRoute::Route($name, $password);
-                        }
-                        Secret::where('id','=',$s['id'])->update(['password'=>$password]);
-                    }
-                }
-            }
-            UserToken::update(User::where('id','=',$user_id)->find());
-            return json_encode(['status'=>1,'msg'=>'加密套餐设置成功']);
-        } else{
-            return json_encode(['status'=>0,'msg'=>'加密套餐设置失败或者内容没变化，请检查']);
+            User::where('id','=',$user_id)->update($data);
         }
+        User::where('id','=',$user_id)->update(['package'=>ShellingOrDecan::Decan($package['package'])]);
+        UserToken::update(User::where('id','=',$user_id)->find());
+        return json_encode(['status'=>1,'msg'=>'加密套餐设置成功']);
     }
 
 }
