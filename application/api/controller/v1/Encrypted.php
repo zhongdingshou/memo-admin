@@ -11,6 +11,7 @@ namespace app\api\controller\v1;
 use think\Loader;
 use app\api\service\Token;
 use app\api\controller\BaseController;
+use app\api\service\UserToken;
 use app\api\model\Encrypted as EncryptedModel;
 use app\api\model\User;
 class Encrypted extends BaseController
@@ -21,7 +22,12 @@ class Encrypted extends BaseController
      */
     public function getEncrypted(){
         $this->isLogin();
-        return json_encode(EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->column('id,problem'));
+        $all = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->column('id,problem');
+        if ($all){
+            return json_encode(['status'=>1,'msg'=>$all]);
+        } else {
+            return json_encode(['status'=>0,'msg'=>null]);
+        }
     }
 
     /**
@@ -35,10 +41,10 @@ class Encrypted extends BaseController
         $this->isLogin();
         Loader::validate('EncryptedValidate')->goCheck();
         $answer = Loader::validate('EncryptedValidate')->getDataByRule(input('post.'))['answer'];
-        $encrypted = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->select();
+        $encrypted = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->order('id')->select();
         for ($i=0;$i<3;$i++){
             if ($answer[$i]!=$encrypted[$i]['answer']){
-                return json_encode(['status'=>0,'msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
+                return json_encode(['status'=>0,'msg'=>'密保验证失败，第'.++$i.'个答案错误，请检查','data'=>$encrypted]);
             }
         }
         return json_encode(['status'=>1,'msg'=>'密保验证成功']);
@@ -60,13 +66,31 @@ class Encrypted extends BaseController
         if ($oldEncrypted) {
             EncryptedModel::where('user_id', '=', $user_id)->delete();
         }
+        if(!$package['problem']||!$package['answer']){
+            $theUser = User::where('id','=',$user_id)->find();
+            if ($theUser['is_set']){
+                $is_set =  explode('.',$theUser['is_set']);
+                $new_set = '.';
+                for ($i=1;$i<count($is_set)-1;$i++){
+                    if ($is_set[$i]!=3){
+                        $new_set = $new_set.$is_set[$i].'.';
+                    }
+                }
+                if ($new_set!='.') {
+                    $data['is_set'] = $new_set;
+                    User::where('id','=',$user_id)->update($data);
+                }
+                UserToken::update(User::where('id','=',$user_id)->find());
+            }
+            return json_encode(['status'=>0,'msg'=>'密保设置失败']);
+        }
         $data['user_id'] = $user_id;
         for ($j=0;$j<3;$j++){
-            $data['problem'] = $package[$j]['problem'];
-            $data['answer'] = $package[$j]['answer'];
+            $data['problem'] = $package['problem'][$j];
+            $data['answer'] = $package['answer'][$j];
             EncryptedModel::create($data);
         }
-        if ($j==2){
+        if ($j==3){
             $theUser = User::where('id','=',$user_id)->find();
             if ($theUser['is_set']){
                 $is_set =  explode('.',$theUser['is_set']);
@@ -75,13 +99,14 @@ class Encrypted extends BaseController
                         break;
                 }
                 if ($i==count($is_set)-1) {
-                    $data['is_set'] = $theUser['is_set'].'3.';
-                    User::where('id','=',$user_id)->update($data);
+                    $newdata['is_set'] = $theUser['is_set'].'3.';
+                    User::where('id','=',$user_id)->update($newdata);
                 }
             } else {
-                $data['is_set'] = $theUser['is_set'].'.3.';
-                User::where('id','=',$user_id)->update($data);
+                $newdata['is_set'] = $theUser['is_set'].'.3.';
+                User::where('id','=',$user_id)->update($newdata);
             }
+            UserToken::update(User::where('id','=',$user_id)->find());
             return json_encode(['status'=>1,'msg'=>'密保设置成功']);
         }
         return json_encode(['status'=>0,'msg'=>'密保设置失败，请检查']);

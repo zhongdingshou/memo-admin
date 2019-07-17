@@ -20,12 +20,18 @@ class EncryptRoute extends EncryptRules
      */
     public static function Route($name,$data){
         switch ($name){
-            case '1':$data=self::addone($data);break;
-            case '2':$data=self::addtwo($data);break;
-            case '3':$data=self::addthree($data);break;
-            case '4':$data=self::addfour($data);break;
-            case '5':$data=self::addfive($data);break;
-            case '6':$data=self::addsix($data);break;
+            case 'CBC模式AES加密':
+                $data=self::addone($data);break;
+            case '加密2':
+                $data=self::addtwo($data);break;
+            case '加密3':
+                $data=self::addthree($data);break;
+            case '加密4':
+                $data=self::addfour($data);break;
+            case '加密5':
+                $data=self::addfive($data);break;
+            case '加密6':
+                $data=self::addsix($data);break;
         }
         return $data;
     }

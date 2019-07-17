@@ -15,14 +15,6 @@ use app\api\model\User;
 use app\api\service\ShellingOrDecan;
 class Command extends BaseController
 {
-    /**
-     * 查看口令
-     * @return false|string
-     */
-    public function getCommand(){
-        $this->isLogin();
-        return json_encode(['status'=>1,'msg'=>$command = UserToken::getTokens()&&Token::getCurrentTokenVar('is_set')!==null?Token::getCurrentTokenVar('command'):'']);
-    }
 
     /**
      * 口令验证
@@ -32,7 +24,7 @@ class Command extends BaseController
         $this->isLogin();
         Loader::validate('CommandValidate')->goCheck();
         $command = Loader::validate('CommandValidate')->getDataByRule(input('post.'))['command'];
-        if (ShellingOrDecan::Decan($command)===Token::getCurrentTokenVar('command'))
+        if (md5(ShellingOrDecan::Decan($command))==Token::getCurrentTokenVar('command'))
             return json_encode(['status'=>1,'msg'=>'口令验证成功']);
         return json_encode(['status'=>0,'msg'=>'口令验证失败，请检查']);
     }
@@ -49,7 +41,7 @@ class Command extends BaseController
         Loader::validate('CommandValidate')->goCheck();
         $user_id = Token::getCurrentUid();
         $command = Loader::validate('CommandValidate')->getDataByRule(input('post.'))['command'];
-        $is_do = User::where('id','=',$user_id)->update(['command'=>ShellingOrDecan::Decan($command)]);
+        $is_do = User::where('id','=',$user_id)->update(['command'=>md5(ShellingOrDecan::Decan($command))]);
         if ($is_do) {
             $theUser = User::where('id','=',$user_id)->find();
             if ($theUser['is_set']){

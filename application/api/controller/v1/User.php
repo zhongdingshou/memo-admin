@@ -58,30 +58,16 @@ class User extends BaseController
      */
     public function quitApplet(){
         $this->isLogin();
-        if (!Token::getCurrentTokenVar('is_set')){
+        $user_id = Token::getCurrentUid();
+        $user = UserModel::where('id','=',$user_id)->find();
+        if ($user) {
             Secret::where('user_id','=',Token::getCurrentUid())->delete();
             UserModel::where('id','=',Token::getCurrentUid())->delete();
             EncryptedModel::where('user_id','=',Token::getCurrentUid())->delete();
             \cache(Token::getTokens(),null);
             return json_encode(['status'=>1,'msg'=>'弃用成功，欢迎下次使用']);
+        } else {
+            return json_encode(['status'=>0,'msg'=>'弃用失败，未找到']);
         }
-        Loader::validate('QuitAppletValidate')->goCheck();
-        $quit = Loader::validate('QuitAppletValidate')->getDataByRule(input('post.'));
-        if ($quit['command']===Token::getCurrentTokenVar('command')){
-            $encrypted = EncryptedModel::where('user_id','=',Token::getCurrentUid())->limit(3)->select();
-            for ($i=0;$i<3;$i++){
-                if ($quit['answer'][$i]!=$encrypted[$i]['answer']){
-                    return json_encode(['status'=>0,'msg'=>'密保验证失败第'.++$i.'个答案错误，请检查']);
-                }
-            }
-        }else {
-            return json_encode(['status'=>0,'msg'=>'口令验证失败，请检查']);
-        }
-        Secret::where('user_id','=',Token::getCurrentUid())->delete();
-        UserModel::where('id','=',Token::getCurrentUid())->delete();
-        EncryptedModel::where('user_id','=',Token::getCurrentUid())->delete();
-        \cache(Token::getTokens(),null);
-        return json_encode(['status'=>1,'msg'=>'弃用成功，欢迎下次使用']);
-
     }
 }

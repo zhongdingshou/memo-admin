@@ -12,7 +12,7 @@ namespace app\api\validate;
 class CommandValidate extends BaseValidate
 {
     protected $rule = [
-        'command' => 'require|isNotEmpty|length:4'
+        'command' => 'require|isNotEmpty'
     ];
 
     protected $message = [

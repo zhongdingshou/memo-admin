@@ -23,16 +23,54 @@ class Email extends BaseController
      * 发送邮箱验证码
      * @return bool|false|string
      * @throws \PHPMailer\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function newEmail(){
         $this->isLogin();
         Loader::validate('EmailValidate')->goCheck();
         $email = Loader::validate('EmailValidate')->getDataByRule(input('post.'));
         $is_go =  SendEmail::sendUserEmailCheck($email['email']);
-        if ($is_go  === true)
+        if ($is_go  === true) {
+            $user_id = Token::getCurrentUid();
+            $theUser = User::where('id','=',$user_id)->find();
+            if ($theUser) {
+                if ($theUser['email']!=$email['email']) {
+                    User::where('id','=',$user_id)->update(['email'=>null]);
+                }
+                if ($theUser['is_set']){
+                    $is_set =  explode('.',$theUser['is_set']);
+                    $new_set = '.';
+                    for ($i=1;$i<count($is_set)-1;$i++){
+                        if ($is_set[$i]!=4){
+                            $new_set = $new_set.$is_set[$i].'.';
+                        }
+                    }
+                    if ($new_set!='.') {
+                        $data['is_set'] = $new_set;
+                        User::where('id','=',$user_id)->update($data);
+                    }
+                    UserToken::update(User::where('id','=',$user_id)->find());
+                }
+            }
             return json_encode(['status'=>1,'msg'=>'验证码发送成功']);
-        User::where('id','=',Token::getCurrentUid())->update(['email'=>null]);
-        return $is_go;
+        } else {
+            return $is_go;
+        }
+    }
+
+    /**
+     * 获取邮箱
+     */
+    public function getEmail(){
+        $this->isLogin();
+        $userCache = Cache::get(Token::getTokens());
+        if ($userCache) {
+            $data = json_decode($userCache,true);
+            return json_encode(['status'=>1,'msg'=>$data['email']]);
+        }
+        return json_encode(['status'=>0,'msg'=>'获取失败']);
     }
 
     /**
@@ -68,9 +106,9 @@ class Email extends BaseController
                 }
                 UserToken::update(User::where('id','=',$user_id)->find());
                 \cache(UserToken::getTokens().$verify,null);
-                return json_encode(['status'=>1,'msg'=>'邮箱设置成功']);
+                return json_encode(['status'=>1,'msg'=>'验证通过，邮箱设置成功']);
             } else {
-                return json_encode(['status'=>0,'msg'=>'邮箱设置失败或者内容没变化，请检查']);
+                return json_encode(['status'=>2,'msg'=>'验证通过']);
             }
         } else {
             return json_encode(['status'=>0,'msg'=>'邮箱设置失败,验证码已过期']);

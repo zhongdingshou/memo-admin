@@ -12,7 +12,8 @@ namespace app\api\validate;
 class IDValidate extends BaseValidate
 {
     protected $rule = [
-        'id' => 'require|isNotEmpty'
+        'id' => 'require|isNotEmpty',
+        'page'=>'number'
     ];
 
     protected $message = [

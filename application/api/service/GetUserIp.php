@@ -7,7 +7,6 @@
  */
 
 namespace app\api\service;
-use think\Request;
 
 class GetUserIp extends BaseService
 {

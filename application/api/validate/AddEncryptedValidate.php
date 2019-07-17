@@ -12,10 +12,12 @@ namespace app\api\validate;
 class AddEncryptedValidate extends BaseValidate
 {
     protected $rule = [
-        'encrypted' => 'require|isNotEmpty|array'
+        'answer' => 'require|isNotEmpty|array',
+        'problem' => 'require|isNotEmpty|array',
     ];
 
     protected $message = [
-        'encrypted' => '请输入需要设置的密保'
+        'answer' => '请输入需要设置的答案',
+        'problem' => '请输入需要设置的密保'
     ];
 }

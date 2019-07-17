@@ -9,6 +9,7 @@
 namespace app\api\controller\v1;
 
 use think\Loader;
+use think\Db;
 use app\api\controller\BaseController;
 use app\api\service\Token;
 use app\api\model\Secret as SecretModel;
@@ -29,13 +30,16 @@ class Secret extends BaseController
      */
     public function getSecret(){
         $this->isLogin();
-        $allData = SecretModel::where('user_id','=',Token::getCurrentUid())->select();
+        Loader::validate('IDValidate')->goCheck();
+        $total_page = Db::name('secret')->where('user_id','=',Token::getCurrentUid())->count();
+        $page = Loader::validate('IDValidate')->getDataByRule(input('get.'))['page']*15-15;
+        $allData = SecretModel::where('user_id','=',Token::getCurrentUid())->limit($page,15)->order('id','desc')->select();
         foreach ($allData as $a){
             unset($a['account']);
             unset($a['password']);
         }
         if ($allData)
-            return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$allData]);
+            return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$allData,'total_page'=>ceil($total_page/15)]);
         return json_encode(['status'=>0,'msg'=>'获取失败，暂未有数据','data'=>$allData]);
     }
 
@@ -60,7 +64,7 @@ class Secret extends BaseController
                 $name = Encryption::where('id', '=', $EncryptionPackages[$k])->value('decrypt_name');
                 $password = DecodeRoute::Route($name, $password);
             }
-            $theSecret['password'] = ShellingOrDecan::Shelling($password);
+            $theSecret['password'] = ShellingOrDecan::Shelling($password,substr(Token::getTokens(),-16));
             return json_encode(['status'=>1,'msg'=>'获取成功','data'=>$theSecret]);
         }
         return json_encode(['status'=>0,'msg'=>'查看该账号密码备忘录失败，未设置加密套餐，请设置']);
@@ -156,6 +160,9 @@ class Secret extends BaseController
     /**
      * 搜索备忘录
      * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function searchSecret(){
         $this->isLogin();
@@ -163,7 +170,11 @@ class Secret extends BaseController
         Loader::validate('SearchSecretValidate')->goCheck();
         $keywords = Loader::validate('SearchSecretValidate')->getDataByRule(input('post.'))['keywords'];
         if (trim($keywords)){
-            $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(15)->column('id,describe');
+            $searchSecret = SecretModel::where('user_id','=',$user_id)->where('describe','like',"%$keywords%")->limit(20)->select();
+            foreach ($searchSecret as $a){
+                unset($a['account']);
+                unset($a['password']);
+            }
             if ($searchSecret)
                 return json_encode(['status'=>1,'msg'=>'搜索成功','data'=>$searchSecret]);
             return json_encode(['status'=>0,'msg'=>'未搜到相关备忘录，请检查']);

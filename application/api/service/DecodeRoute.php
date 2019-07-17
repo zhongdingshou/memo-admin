@@ -19,12 +19,18 @@ class DecodeRoute extends DecodeRules
      */
     public static function Route($name,$data){
         switch ($name){
-            case '1':$data=self::addone($data);break;
-            case '2':$data=self::addtwo($data);break;
-            case '3':$data=self::addthree($data);break;
-            case '4':$data=self::addfour($data);break;
-            case '5':$data=self::addfive($data);break;
-            case '6':$data=self::addsix($data);break;
+            case 'CBC模式AES解密':
+                $data=self::addone($data);break;
+            case '解密2':
+                $data=self::addtwo($data);break;
+            case '解密3':
+                $data=self::addthree($data);break;
+            case '解密4':
+                $data=self::addfour($data);break;
+            case '解密5':
+                $data=self::addfive($data);break;
+            case '解密6':
+                $data=self::addsix($data);break;
         }
         return $data;
     }
