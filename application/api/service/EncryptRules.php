@@ -12,9 +12,13 @@ namespace app\api\service;
 class EncryptRules extends BaseService
 {
 
-    public static function addone($data){
-        $data.=1;
-        return $data;
+    public static function AES_CBC($data){
+        $method = "AES-128-CBC";
+        $password = config('encryptiontodecrypt.aes_cbc_key');
+        list($usec, $sec) = explode(" ", microtime());
+        $get_iv = "a".(string)((float)$usec + (float)$sec);
+        $e_data = openssl_encrypt($data, $method, $password, $options=0, $iv=$get_iv);
+        return   $get_iv.$e_data;
     }
     public static function addtwo($data){
         $data.=22;

@@ -20,7 +20,7 @@ class DecodeRoute extends DecodeRules
     public static function Route($name,$data){
         switch ($name){
             case 'CBC模式AES解密':
-                $data=self::addone($data);break;
+                $data=self::AES_CBC($data);break;
             case '解密2':
                 $data=self::addtwo($data);break;
             case '解密3':

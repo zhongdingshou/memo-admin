@@ -11,9 +11,12 @@ namespace app\api\service;
 
 class DecodeRules extends BaseService
 {
-    public static function addone($data){
-        $data=substr($data,0,strlen($data)-1);
-        return $data;
+    public static function AES_CBC($data){
+        $method = "AES-128-CBC";
+        $password = config('encryptiontodecrypt.aes_cbc_key');
+        $e_data = substr($data, 16);
+        $get_iv = substr($data, 0, 16);
+        return openssl_decrypt($e_data, $method,$password, $options=0, $iv=$get_iv);
     }
     public static function addtwo($data){
         $data=substr($data,0,strlen($data)-2);

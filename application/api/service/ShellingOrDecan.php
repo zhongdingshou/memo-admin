@@ -19,7 +19,7 @@ class ShellingOrDecan extends BaseService
      */
     public static function Shelling($data,$get_iv){
         $method = "AES-128-CBC";
-        $password = "0123456789ABCDEF";
+        $password = config('encryptiontodecrypt.transmission_key');
         $res = openssl_encrypt($data, $method, $password, $options=0, $iv=$get_iv);
         return  base64_encode($get_iv.$res);
     }
@@ -33,7 +33,7 @@ class ShellingOrDecan extends BaseService
         $base64_decryption = base64_decode($data);
         $true_data = substr($base64_decryption, 16);
         $method = "AES-128-CBC";
-        $password = "0123456789ABCDEF";
+        $password = config('encryptiontodecrypt.transmission_key');
         $get_iv = substr($base64_decryption, 0, 16);
         return openssl_decrypt($true_data, $method,$password, $options=0, $iv=$get_iv);
     }

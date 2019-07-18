@@ -24,7 +24,7 @@ class Command extends BaseController
         $this->isLogin();
         Loader::validate('CommandValidate')->goCheck();
         $command = Loader::validate('CommandValidate')->getDataByRule(input('post.'))['command'];
-        if (md5(ShellingOrDecan::Decan($command))==Token::getCurrentTokenVar('command'))
+        if (md5(ShellingOrDecan::Decan($command).config('encryptiontodecrypt.commanad_salt'))==Token::getCurrentTokenVar('command'))
             return json_encode(['status'=>1,'msg'=>'口令验证成功']);
         return json_encode(['status'=>0,'msg'=>'口令验证失败，请检查']);
     }
@@ -41,7 +41,7 @@ class Command extends BaseController
         Loader::validate('CommandValidate')->goCheck();
         $user_id = Token::getCurrentUid();
         $command = Loader::validate('CommandValidate')->getDataByRule(input('post.'))['command'];
-        $is_do = User::where('id','=',$user_id)->update(['command'=>md5(ShellingOrDecan::Decan($command))]);
+        $is_do = User::where('id','=',$user_id)->update(['command'=>md5(ShellingOrDecan::Decan($command).config('encryptiontodecrypt.commanad_salt'))]);
         if ($is_do) {
             $theUser = User::where('id','=',$user_id)->find();
             if ($theUser['is_set']){
