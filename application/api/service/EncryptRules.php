@@ -15,10 +15,8 @@ class EncryptRules extends BaseService
     public static function AES_CBC($data){
         $method = "AES-128-CBC";
         $password = config('encryptiontodecrypt.aes_cbc_key');
-        list($usec, $sec) = explode(" ", microtime());
-        $get_iv = "a".(string)((float)$usec + (float)$sec);
-        $e_data = openssl_encrypt($data, $method, $password, $options=0, $iv=$get_iv);
-        return   $get_iv.$e_data;
+        $get_iv = 'f7459d292a21c166';
+        return  openssl_encrypt($data, $method, $password, $options=0, $iv=$get_iv);
     }
     public static function addtwo($data){
         $data.=22;

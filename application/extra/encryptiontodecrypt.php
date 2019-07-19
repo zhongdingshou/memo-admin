@@ -13,7 +13,7 @@ return [
     //'transmission_iv' => 'ABCDEF0123456789',//数据传输时加密解密的密钥偏移量
 
     'aes_cbc_key' => '7ec7db21a1c90139',//cbc模式aes密钥
-    //'aes_cbc_iv' => 'f7459d292a21c166',//cbc模式aes密钥偏移量
+//    'aes_cbc_iv' => 'f7459d292a21c166',//cbc模式aes密钥偏移量
 
 
 ];
