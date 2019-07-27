@@ -69,10 +69,10 @@ class Encryption extends BaseController
                     if ($j == count($newpackage) - 1) {
                         Secret::where('id','=',$s['id'])->update(['password'=>$password]);
                     } else {
-                        return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请检查']);
+                        return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请重新选择']);
                     }
                 } else {
-                    return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请检查']);
+                    return json_encode(['status'=>0,'msg'=>'加密套餐设置失败，请重新选择']);
                 }
             }
         } else {
