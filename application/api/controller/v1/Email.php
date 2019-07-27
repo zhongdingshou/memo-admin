@@ -34,24 +34,27 @@ class Email extends BaseController
         $is_go =  SendEmail::sendUserEmailCheck($email['email']);
         if ($is_go  === true) {
             $user_id = Token::getCurrentUid();
+            if(!$user_id){
+                return json_encode(['status'=>0,'msg'=>'用户未登录']);
+            }
             $theUser = User::where('id','=',$user_id)->find();
-            if ($theUser) {
+            if ($theUser['email']) {
                 if ($theUser['email']!=$email['email']) {
                     User::where('id','=',$user_id)->update(['email'=>null]);
-                }
-                if ($theUser['is_set']){
-                    $is_set =  explode('.',$theUser['is_set']);
-                    $new_set = '.';
-                    for ($i=1;$i<count($is_set)-1;$i++){
-                        if ($is_set[$i]!=4){
-                            $new_set = $new_set.$is_set[$i].'.';
+                    if ($theUser['is_set']){
+                        $is_set =  explode('.',$theUser['is_set']);
+                        $new_set = '.';
+                        for ($i=1;$i<count($is_set)-1;$i++){
+                            if ($is_set[$i]!=4){
+                                $new_set = $new_set.$is_set[$i].'.';
+                            }
                         }
+                        if ($new_set!='.') {
+                            $data['is_set'] = $new_set;
+                            User::where('id','=',$user_id)->update($data);
+                        }
+                        UserToken::update(User::where('id','=',$user_id)->find());
                     }
-                    if ($new_set!='.') {
-                        $data['is_set'] = $new_set;
-                        User::where('id','=',$user_id)->update($data);
-                    }
-                    UserToken::update(User::where('id','=',$user_id)->find());
                 }
             }
             return json_encode(['status'=>1,'msg'=>'验证码发送成功']);
